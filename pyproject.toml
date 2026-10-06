@@ -1,0 +1,51 @@
+[project]
+name = "hcr-c2-052"
+version = "0.1.0"
+description = "ClinicalBiomedicalQAAgent — AgentCore Template"
+requires-python = ">=3.11"
+# The framework (agenticstar-agentcore) is NOT a public-PyPI dependency; it is
+# provided by CI per repository generation — a stub package on PYTHONPATH for older repos,
+# or installed from the package registry for wheel-era repos (see the dual-mode
+# run-tests job in the pipeline definition). Pinning it here would make `pip install -e .`
+# fail because it is not resolvable from the default index.
+dependencies = [
+    "agenticstar-agentcore[marketplace,openai]==1.0.3",]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.3",
+    "pytest-cov==5.0.0",
+    "pytest-asyncio==1.4.0",
+    "ruff==0.4.4",
+    "mypy==1.10.0",
+]
+
+[build-system]
+requires = ["setuptools==68.2.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+exclude = ["src/examples/"]
+# Compatibility exception for the published framework wheel: it ships no typing
+# marker, so framework.* / shared.* imports resolve to Any — which makes every
+# required framework subclass an [import-untyped] / "subclass of Any" error.
+# Every other strict setting stays on.
+disallow_subclassing_any = false
+
+[[tool.mypy.overrides]]
+module = ["framework.*", "shared.*"]
+ignore_missing_imports = true
+
+# State extends the framework's typed-dict state with agent-specific fields —
+# correct at runtime, but the untyped wheel makes that base resolve to Any, so
+# mypy cannot see the typed-dict base and mis-flags every field. Silence only
+# that diagnostic, only for the state module.
+[[tool.mypy.overrides]]
+module = ["src.schemas.state"]
+disable_error_code = ["valid-type"]

@@ -1,0 +1,28 @@
+# Runtime parameters — loaded at start-up and handed to the graph as
+# Graph(config=...). Separate from config/agent.yaml, which is the static
+# deployment manifest.
+#
+# Every value below is validated at start-up: a malformed or out-of-range
+# entry fails the compile rather than degrading silently to a default.
+
+max_retry: 3
+timeout_s: 30
+
+query:
+  # Hard ceiling on the caller's clinical question, in characters.
+  max_chars: 2000
+
+retrieval:
+  # Knowledge-base passages retrieved and rendered per question.
+  top_k: 3
+  # Characters of the question carried into a retrieved passage header.
+  query_excerpt_chars: 80
+  # Characters of the question echoed in the answer header.
+  answer_excerpt_chars: 120
+
+clinical:
+  # Rendering caps for the assembled answer.
+  max_guidelines: 2
+  max_icd11_codes: 5
+  # Maximum caller-supplied clinical terms accepted on the structured channel.
+  max_context_terms: 8
